@@ -192,18 +192,34 @@ The project is pre-configured for GitHub Pages:
 - **`404.html`**: Automatically generated on build so refreshing or direct routing loads properly.
 - **Client Fallback & ErrorBoundary**: Ensures the UI never crashes or displays a blank screen if backend APIs are offline.
 
-#### How to Deploy via GitHub Actions (Recommended):
-1. Push your code to your GitHub repository (branch `main`).
-2. On GitHub, navigate to **Settings** → **Pages**.
-3. Under **Build and deployment** → **Source**, select **GitHub Actions**.
-4. Push a new commit or go to the **Actions** tab and trigger the **"Deploy to GitHub Pages"** workflow.
-5. In ~1 minute, your site will be live at `https://<username>.github.io/<repository-name>/`.
+#### Why a Blank White Page Happens on GitHub Pages (and How to Fix It):
+1. **GitHub Pages Source is set to "Deploy from a branch" instead of "GitHub Actions"**:
+   - If GitHub Pages is set to serve directly from the `main` branch root, it serves the raw `index.html` which points to TypeScript `/src/main.tsx`. Browsers cannot run raw TypeScript, resulting in a blank white page.
+   - **Fix**: In GitHub repository **Settings** → **Pages** → **Build and deployment** → change **Source** from *"Deploy from a branch"* to **"GitHub Actions"**.
+2. **Missing Trailing Slash in the URL**:
+   - Visiting `https://<user>.github.io/<repo>` (without `/`) can cause browsers to look for `./assets/` at the domain root rather than the repository subfolder.
+   - **Fix**: We added an automated trailing-slash redirect in `index.html` and dynamic repository base handling in `vite.config.ts`.
+3. **Branch Name**:
+   - If your default branch is `master` instead of `main`, the workflow is now updated to trigger automatically on both `main` and `master`.
 
-#### Manual Deployment via gh-pages branch:
+#### Method 1: Deploy Automatically via GitHub Actions (Zero Local Setup)
+1. Commit all files (including `package.json`, `package-lock.json`, and `.github/workflows/deploy.yml`) to GitHub:
+   ```bash
+   git add .
+   git commit -m "fix: github pages deployment"
+   git push origin main
+   ```
+2. In your GitHub repo, go to **Settings** → **Pages**.
+3. Under **Build and deployment** → **Source**, select **GitHub Actions** (NOT "Deploy from a branch").
+4. Go to the **Actions** tab on GitHub: watch the workflow run and finish.
+5. Visit your published link (e.g. `https://<username>.github.io/Sindh-Citizen-Shield-Cyber/`).
+
+#### Method 2: One-Command Deployment via `gh-pages` (Alternative)
+If you prefer deploying from a branch:
 ```bash
-npm run build
-npx gh-pages -d dist
+npm run deploy
 ```
+*(This automatically builds `dist/` and pushes the compiled production files directly to the `gh-pages` branch. Then in **Settings** → **Pages**, select Source: "Deploy from a branch" → branch `gh-pages` → `/ (root)`).*
 
 ---
 

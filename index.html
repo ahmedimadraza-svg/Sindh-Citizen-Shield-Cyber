@@ -45,8 +45,13 @@
           ) {
             if (event.stopImmediatePropagation) event.stopImmediatePropagation();
             if (event.preventDefault) event.preventDefault();
+        // Normalize repository URLs on GitHub Pages to enforce trailing slash so relative paths ./assets/ resolve correctly
+        try {
+          var pathname = window.location.pathname;
+          if (pathname && pathname.length > 1 && !pathname.endsWith('/') && !pathname.includes('.')) {
+            window.location.replace(window.location.origin + pathname + '/' + window.location.search + window.location.hash);
           }
-        }, true);
+        } catch (_) {}
       })();
     </script>
     <title>Sindh Cyber Saathi - Civic Cyber Defense</title>
