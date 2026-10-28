@@ -1,0 +1,21 @@
+# GitLab Pages Deployment Pipeline
+image: node:22
+
+pages:
+  stage: deploy
+  cache:
+    paths:
+      - node_modules/
+  script:
+    - npm ci || npm install
+    - npm run build
+    - rm -rf public_temp
+    - mv public public_temp
+    - mv dist public
+    - cp -r public_temp/* public/ || true
+    - rm -rf public_temp
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"

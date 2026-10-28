@@ -6,9 +6,13 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   const getBase = () => {
     if (process.env.BASE_URL) return process.env.BASE_URL;
+    if (process.env.VITE_BASE_PATH) return process.env.VITE_BASE_PATH;
     if (process.env.GITHUB_REPOSITORY) {
       const repoName = process.env.GITHUB_REPOSITORY.split('/')[1];
       if (repoName) return `/${repoName}/`;
+    }
+    if (process.env.CI_PROJECT_NAME && process.env.GITLAB_CI) {
+      return `/${process.env.CI_PROJECT_NAME}/`;
     }
     return './';
   };
