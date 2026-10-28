@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-arabic: 'Noto Sans Arabic', 'Noto Nastaliq Urdu', 'Segoe UI', Tahoma, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #FAF8FF;
+    color: #131B2E;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  [dir="rtl"] {
+    font-family: var(--font-arabic), var(--font-sans);
+    line-height: 1.65;
+  }
+}
+
+/* Tactile 3D Button Depth */
+.btn-tactile-primary {
+  background-color: #063E28;
+  color: #FFFFFF;
+  box-shadow: 0 4px 0 #032014, 0 8px 16px -2px rgba(6, 62, 40, 0.25);
+  transition: all 0.12s ease;
+}
+
+.btn-tactile-primary:hover {
+  background-color: #084c32;
+}
+
+.btn-tactile-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #032014, 0 4px 8px -2px rgba(6, 62, 40, 0.2);
+}
+
+.btn-tactile-emergency {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  box-shadow: 0 3px 0 #7F1D1D, 0 6px 14px rgba(220, 38, 38, 0.3);
+  transition: all 0.12s ease;
+}
+
+.btn-tactile-emergency:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #7F1D1D;
+}
+
+/* Defensive Cards */
+.card-tactile {
+  background: #FFFFFF;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.03), 0 4px 12px rgba(6, 62, 40, 0.04);
+}
+
+.tab-active {
+  color: #063E28;
+  font-weight: 700;
+}

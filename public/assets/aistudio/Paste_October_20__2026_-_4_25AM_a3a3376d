@@ -1,0 +1,532 @@
+PROJECT: CYBER SAATHI
+TASK: BUILD A UNIVERSAL, EVIDENCE-BASED SCAM, LINK, SCREENSHOT, CHALLAN AND DOCUMENT INVESTIGATION SYSTEM
+
+CRITICAL CONTEXT
+
+The application has a serious classification problem. Punjab e-Challan screenshots may receive an acceptable result, but other incorrect, fraudulent, or misleading challan screenshots can also be marked “OK,” “Correct,” or “No Threat Found.”
+
+Fix the underlying investigation and verdict architecture. Do not solve this by adding only Punjab challan keywords, by making every upload a confirmed scam, or by changing every result to suspicious.
+
+Preserve the existing application, premium UI, S-shield logo, English interface, current features, and server-side API-key security. Do not rebuild the project from scratch.
+
+The goal is to help users identify scams across Pakistan, especially Sindh and Punjab, while explaining exactly what was and was not verified.
+
+ZERO-COST REQUIREMENT
+
+- Do not introduce paid APIs, subscriptions, paid databases, paid browser services, or paid hosting without my explicit approval.
+- Prefer existing dependencies, locally executed rules, verified public official sources, and APIs that are genuinely available within their current free terms and limits.
+- Verify the current terms, quotas, and non-commercial restrictions of any external API before relying on it.
+- Do not promise unlimited free operation if a provider imposes quotas or restrictions.
+- Keep all secrets and API keys on the server. Never expose them in frontend code.
+- If a free service is unavailable, report the limitation and continue with clearly labelled local evidence checks.
+
+PART 1 — UNIVERSAL INVESTIGATION, NOT JUST CHALLAN DETECTION
+
+The app must investigate all of the following:
+
+A. TRAFFIC CHALLANS AND FINES
+
+- Punjab e-Challan and traffic violation notices.
+- Sindh traffic challans and vehicle-related payment requests.
+- Vehicle registration, token tax, driving licence, parking fine, toll and road-violation notices.
+- Fake traffic police, court, excise department and government fine messages.
+- Fake challan PDFs, altered receipts, fabricated vehicle details and misleading QR codes.
+- Threats of immediate arrest, licence suspension, vehicle seizure or extra penalties unless an immediate payment is made.
+
+B. GOVERNMENT BENEFITS AND PUBLIC SERVICES
+
+- BISP and alleged 8171 financial assistance.
+- Government grants, subsidies, scholarships and relief funds.
+- Fake flood-relief, ration, cash assistance and employment schemes.
+- NADRA CNIC, family registration, passport, visa and identity-related messages.
+- Tax refunds, government fees, court notices, public-service applications and licence renewals.
+- Fake police, FIA, NCCIA, PTA and other government-department communications.
+
+C. BANKING AND MOBILE WALLETS
+
+- Fake bank alerts and account-blocking warnings.
+- JazzCash, Easypaisa and other mobile-wallet impersonation.
+- Requests for OTPs, PINs, passwords, recovery codes, card details or account credentials.
+- Fake refunds, failed transactions, suspicious transfers and fraudulent payment receipts.
+- Fake KYC verification, account reactivation and account-security notices.
+
+D. GENERAL ONLINE SCAMS
+
+- Prize, lottery, free mobile phone and free-parcel scams.
+- WhatsApp, SMS, Facebook, Instagram, TikTok and other social-media scams.
+- Fake job offers, work-from-home tasks and advance recruitment fees.
+- Fake investments, Ponzi schemes, cryptocurrency promises and guaranteed returns.
+- Fake shopping stores, counterfeit products and payment-before-delivery fraud.
+- Parcel delivery fees, customs charges and courier impersonation.
+- Romance scams, blackmail, sextortion and threats to expose private information.
+- Fake charities, donations, emergency appeals and disaster-relief campaigns.
+- Fake customer support, remote-access requests and account-recovery scams.
+- QR-code phishing, fake login pages, browser warnings and malicious downloads.
+- Fake receipts, screenshots of bank transfers, fabricated invoices and edited certificates.
+
+E. OTHER DOCUMENTS AND IMAGES
+
+- Uploaded screenshots that contain no links.
+- Screenshots containing text, QR codes, logos, seals, signatures or reference numbers.
+- Images with missing, cropped, blurred, contradictory or altered details.
+- Documents whose authenticity cannot be established from the image alone.
+
+Do not assume every uploaded document is genuine or fraudulent. Investigate the actual evidence.
+
+PART 2 — FIX THE MEANING OF EVERY VERDICT
+
+Inspect the entire application and remove any logic that automatically converts an unknown result, failed request, missing field, empty threat-intelligence response or malformed API response into a green “OK” result.
+
+Use these four canonical verdicts:
+
+1. CONFIRMED THREAT
+   Strong evidence establishes a known malicious destination, a reliable threat-intelligence match, or a clearly deceptive attempt to steal credentials or money supported by sufficient context.
+
+2. SUSPICIOUS
+   Meaningful warning signs or possible impersonation exist, but available evidence does not conclusively establish fraud.
+
+3. NO KNOWN THREAT FOUND
+   The checks actually completed did not identify a known threat. This does not establish that the image, challan, website, sender or transaction is genuine.
+
+4. UNABLE TO VERIFY
+   The image is unreadable, necessary evidence is missing, the service fails, official verification is unavailable, or there is insufficient evidence to reach a reliable conclusion.
+
+Never use “Correct,” “Genuine,” “Verified,” “Safe,” or a green success badge as a synonym for NO KNOWN THREAT FOUND.
+
+For example, a screenshot of a challan that cannot be checked against the relevant official system must not receive an “All Correct” verdict simply because its layout looks professional.
+
+Keep two separate concepts in the results:
+
+- THREAT ASSESSMENT: Is there evidence of fraud or malicious activity?
+- AUTHENTICITY / RECORD VERIFICATION: Was this specific challan, notice, receipt or claim actually verified against an authoritative source?
+
+A document can have no known malicious link and still be fabricated. A genuine document can also contain a link that is unsafe because of tampering. Evaluate each question separately.
+
+PART 3 — BUILD A COMPREHENSIVE URL INVESTIGATION ENGINE
+
+Extract every visible URL, hyperlink where technically available, QR destination, short link, redirect destination and domain found in the screenshot or document.
+
+Normalize URLs safely before analysis. Preserve the original displayed URL for evidence and explanation.
+
+Check for the following warning signs:
+
+1. Look-alike domains and typosquatting
+   Examples:
+
+- A domain replacing one letter in an official brand.
+- Added or missing characters.
+- Repeated letters or swapped characters.
+- Hyphens inserted into an authority's name.
+- Official names combined with words such as “fine,” “grant,” “refund,” “verify,” “payment,” “reward” or “support.”
+
+2. Deceptive subdomains
+   Explain the difference between:
+
+- psca.gop.pk.example.com
+- example-psca-gop-pk.com
+- a genuine hostname whose registrable domain actually belongs to the relevant authority.
+
+Do not decide domain ownership by searching for a trusted name anywhere in the URL. Parse the hostname and registrable domain correctly using a maintained Public Suffix List or an equivalent reliable method.
+
+3. Homograph attacks
+   Detect suspicious Unicode characters, visually similar letters, punycode domains, mixed scripts and look-alike characters.
+
+4. URL obfuscation
+   Check:
+
+- URL encoding and unusual escape sequences.
+- @ symbols and misleading user-information sections.
+- IP-address URLs instead of normal domains.
+- Excessive nested subdomains.
+- Unusual ports.
+- Excessive redirects.
+- Encoded destination parameters.
+- URL shorteners and redirect services.
+- Unicode dot variants and confusing punctuation.
+- Suspicious file extensions and download destinations.
+
+5. Connection and domain signals
+   Evaluate:
+
+- HTTP versus HTTPS.
+- Certificate and TLS errors where safely obtainable.
+- DNS resolution failures.
+- Newly observed or suspicious domain characteristics where reliable data is available.
+- Known phishing, malware and unwanted-software matches.
+- Suspicious redirects and mismatched final destinations.
+- Unexpected login, payment or credential forms.
+- Browser and page inspection results where the secure browser engine is available.
+
+IMPORTANT: HTTP, a new domain, a failed DNS lookup, a private sender number, or an unusual TLD is a warning signal at most. None independently proves fraud.
+
+An unreachable domain must still be checked for brand impersonation before attempting DNS resolution. A nonexistent phishing domain can still be deceptive.
+
+A clean threat-intelligence result is not proof of safety.
+
+PART 4 — OFFICIAL SOURCES AND VERIFIED DOMAIN REGISTRY
+
+Create a central, maintainable AUTHORITATIVE_REGISTRY. Do not scatter hardcoded domain assumptions across different files.
+
+Use the following as initial source candidates. Verify every entry against current official information before activating it as an authoritative source.
+
+PAKISTAN NATIONAL CYBERCRIME AND GOVERNMENT SOURCES
+
+1. National Cyber Crime Investigation Agency (NCCIA)
+   [https://www.nccia.gov.pk/](https://www.nccia.gov.pk/)
+   Complaint portal:
+   [https://complaint.nccia.gov.pk/](https://complaint.nccia.gov.pk/)
+   Use the currently published official contact and reporting information.
+
+2. Federal Investigation Agency (FIA)
+   [https://fia.gov.pk/](https://fia.gov.pk/)
+   Treat FIA as a separate institution and verify its current responsibilities. Do not automatically redirect every cybercrime-related verification to an outdated FIA process.
+
+3. Government of Pakistan
+   [https://pakistan.gov.pk/](https://pakistan.gov.pk/)
+   Verify that any specific service or linked portal is actually endorsed by the relevant government authority.
+
+4. Pakistan Citizen Portal
+   [https://web.citizenportal.gov.pk/](https://web.citizenportal.gov.pk/)
+   Verify the current official domain and service before using it.
+
+PUNJAB GOVERNMENT AND TRAFFIC SERVICES
+
+5. Punjab Safe Cities Authority (PSCA)
+   [https://psca.gop.pk/](https://psca.gop.pk/)
+   Start from the official PSCA website and identify the currently linked e-Challan service from its official pages.
+
+6. Government of Punjab
+   [https://punjab.gov.pk/](https://punjab.gov.pk/)
+   Use official departmental links to discover and verify the appropriate service for a particular notice.
+
+7. Punjab Police
+   Discover its currently authoritative website from the official Punjab government or relevant official departmental links before adding it to the registry.
+
+8. Punjab Excise, Taxation and Narcotics Control
+   Discover the correct official departmental website and relevant vehicle services through verified Punjab government links.
+
+Do not guess an e-Challan subdomain. Verify the exact current e-Challan URL through the official PSCA website. Do not mark a specific challan genuine merely because the destination domain belongs to PSCA.
+
+SINDH GOVERNMENT AND SERVICES
+
+9. Government of Sindh
+   [https://www.sindh.gov.pk/](https://www.sindh.gov.pk/)
+
+10. Sindh Police
+    Discover the currently official website through verified Government of Sindh links.
+
+11. Sindh Excise, Taxation and Narcotics Control
+    Verify the department's current official website and applicable vehicle verification services through the Government of Sindh.
+
+12. Other Sindh government departments
+    Add relevant departments only after validating their identity, domain, purpose and official linking relationships.
+
+IDENTITY, WELFARE AND TELECOMMUNICATION
+
+13. NADRA
+    [https://www.nadra.gov.pk/](https://www.nadra.gov.pk/)
+    NADRA publishes a domain-authenticity policy. Verify the precise hostname and any relevant official subdomain against the current policy.
+
+14. Benazir Income Support Programme (BISP)
+    [https://www.bisp.gov.pk/](https://www.bisp.gov.pk/)
+    Verify the official website, current beneficiary-verification procedure and published communication guidance. Do not rely on a displayed 8171 sender ID alone.
+
+15. Pakistan Telecommunication Authority (PTA)
+    [https://www.pta.gov.pk/](https://www.pta.gov.pk/)
+    Verify the exact official domain and the current complaint or telecom-related services relevant to the message.
+
+16. State Bank of Pakistan (SBP)
+    [https://www.sbp.org.pk/](https://www.sbp.org.pk/)
+    Use for regulator information, public advisories and relevant official notices. Do not assume SBP can validate a private bank transaction unless an actual suitable public verification service exists.
+
+FINANCIAL AND CORPORATE REGULATORS
+
+17. Securities and Exchange Commission of Pakistan (SECP)
+    [https://www.secp.gov.pk/](https://www.secp.gov.pk/)
+    Use official warnings, regulated-entity information and published lists where relevant.
+
+18. Other official financial regulators and institutions
+    Add only after verifying the correct institution, official hostname, purpose, source freshness and available public verification mechanism.
+
+BANKS, WALLETS AND COURIER COMPANIES
+
+19. Banking services
+    Do not use one generic “official bank” rule. Maintain a separate verified registry for each bank and its legitimate domains, based on authoritative institutional sources.
+
+20. Mobile-wallet services
+    Verify the legitimate domains and published support channels for each relevant provider, including JazzCash and Easypaisa, from their authoritative sources.
+
+21. Couriers, shopping platforms and other service providers
+    Verify each organization's official domains separately. Do not trust a sender or a URL merely because it includes a company name.
+
+REGISTRY REQUIREMENTS
+
+Each registry entry must contain:
+
+- Organization name.
+- Exact verified hostname.
+- Parent organization and country.
+- Service category.
+- Authoritative source URL used to establish the entry.
+- Verification timestamp.
+- Last successful check.
+- Status: verified, stale, disputed or disabled.
+- Specific services the domain is authorized to provide.
+- Known official subdomains where independently confirmed.
+- Applicable restrictions and limitations.
+
+Never trust every arbitrary subdomain simply because its parent name resembles an official organization.
+
+A domain can belong to a real organization while a particular page, claim, document or payment request is still fraudulent.
+
+If the official registry cannot be refreshed, use the last verified data only within a documented freshness policy. Otherwise report the limitation instead of inventing a successful verification.
+
+Do not claim that the registry contains every official website in Pakistan. Make it expandable and maintainable.
+
+PART 5 — VERIFY THE ACTUAL RECORD, NOT JUST THE WEBSITE
+
+For challans, notices, grants, fines, receipts, registrations and financial claims:
+
+1. Extract reference numbers and visible details only when readable.
+2. Identify the claimed issuing authority.
+3. Find the exact official service that is designed to verify that record.
+4. Access it only through the verified official route.
+5. Use an official public lookup mechanism only when it genuinely exists and is permitted.
+6. Compare the fields the official service actually returns against the screenshot.
+7. Record whether the lookup succeeded, failed, returned no record, or was unavailable.
+8. Report discrepancies explicitly.
+9. Never fabricate an API response, reference match, successful record lookup or official confirmation.
+10. Never bypass authentication, CAPTCHAs, access controls or official-service restrictions.
+
+If a challan cannot be checked through an accessible official service, say “Challan authenticity not independently verified.” Do not conclude that it is correct merely because the image resembles an official challan.
+
+If the record number, amount or vehicle details do not match an authoritative response, flag the discrepancy for investigation. Consider the possibility of OCR errors before declaring fraud.
+
+Do not request or store unnecessary CNICs, passwords, OTPs, full payment-card numbers, private financial details or unrelated personal information.
+
+PART 6 — SCAM PATTERN AND CONTEXT DETECTION
+
+Detect the meaning of the message, not just individual keywords.
+
+Credential theft:
+
+- Requests to send an OTP, PIN, password, recovery code or authentication token.
+- Requests to disclose wallet or bank login credentials.
+- Fake verification forms that collect sensitive data.
+
+Advance-fee fraud:
+
+- Pay a fee to unlock a grant, prize, parcel, job, refund or benefit.
+- Requests for a processing fee, registration charge or release payment under suspicious circumstances.
+
+Impersonation:
+
+- False claims to represent police, a court, a government authority, a bank, a telecom provider or a public welfare scheme.
+- Brand names paired with unrelated payment destinations.
+- Fake official contact details or copied logos.
+
+Coercion and urgency:
+
+- Immediate payment demands accompanied by threats of arrest, prosecution, account closure, vehicle seizure or extra fines.
+- Pressure to bypass normal official procedures.
+- Requests for secrecy or warnings not to contact the actual authority.
+
+Payment manipulation:
+
+- Personal wallet or bank-account payments presented as mandatory government payments without authoritative support.
+- Requests to pay an unrelated individual.
+- Altered account numbers, suspicious beneficiary names and mismatched merchant details.
+
+Fake proof:
+
+- Edited receipts and fabricated transfer confirmations.
+- Inconsistent dates, totals, reference numbers or institution names.
+- Screenshots claiming a payment has succeeded when no authoritative transaction verification exists.
+
+Other patterns:
+
+- Fake investment returns, job recruitment fees, parcel charges, prize claims, fake support numbers, blackmail, malicious downloads and QR phishing.
+
+A genuine public safety warning that says “never share your OTP” must not be treated as an OTP theft attempt.
+
+A request that says “send us your OTP to receive your grant” is materially different and must be assessed in context.
+
+A threat keyword alone must not automatically prove fraud. A legitimate court notice may mention prosecution, and a genuine challan may require payment. Evaluate the issuing authority, destination, request, corroboration and other evidence together.
+
+PART 7 — SCREENSHOT AND QR-CODE ANALYSIS
+
+For every image:
+
+- Extract visible text.
+- Preserve the original extracted text for auditability.
+- Detect URLs and QR codes independently where possible.
+- Decode QR destinations without automatically navigating to them.
+- Compare all destinations against the authoritative registry and threat-intelligence checks.
+- Detect brand impersonation before DNS resolution.
+- Report unreadable sections and uncertain OCR.
+- Distinguish image content from facts independently verified online.
+- Do not trust logos, seals, signatures, fonts, colors, layouts or official-looking formatting as proof of authenticity.
+- Detect conflicting amounts, reference numbers, dates and payment details when readable.
+- Never fabricate missing information.
+
+If the screenshot has no URL, investigate the text and claims anyway. A scam does not need to contain a clickable link.
+
+If a URL cannot be resolved, retain any evidence already extracted from its hostname, path and message context.
+
+PART 8 — SHARED EVIDENCE PIPELINE
+
+Use one consistent evidence pipeline for:
+
+- Screenshot analysis.
+- Link checking.
+- QR-code inspection.
+- Challan and document investigation.
+- Chat-based explanations.
+
+Create a structured evidence report with separate fields for:
+
+A. Content and claims.
+B. Suspicious requests and scam indicators.
+C. URL, domain and redirect risks.
+D. Official-source corroboration.
+E. Sender authenticity.
+F. Record or document authenticity.
+G. Threat-intelligence results.
+H. Evidence quality and OCR confidence.
+I. Service errors and unavailable checks.
+J. Final verdict and explanation.
+
+Every conclusion must be traceable to evidence. Keep observed facts, inference and unverified claims clearly separated.
+
+Do not let a single empty API response, missing URL, successful DNS lookup, valid HTTPS certificate or known-looking sender override stronger contradictory evidence.
+
+PART 9 — THREAT INTELLIGENCE AND FREE OPERATION
+
+Inspect the currently implemented threat-intelligence integration. Verify its current documentation, support status, usage terms, quotas and cost implications.
+
+If the existing Google Safe Browsing v4 integration is still being used, investigate its documented deprecation and determine whether a compatible migration to the current supported version is appropriate. Do not silently break the working app or introduce a paid product.
+
+Use threat-intelligence checks as one evidence source, not the sole classification mechanism.
+
+Handle:
+
+- Confirmed threat matches.
+- Empty results.
+- Timeouts.
+- Missing credentials.
+- Quota errors.
+- Malformed responses.
+- Unavailable services.
+
+A clean response means only that the queried service returned no matching known threat for that check. It does not prove a site is legitimate.
+
+Never cache a transient failure as a clean result. Use bounded cache durations for successful results, and document the freshness policy.
+
+If no external service is available, continue with local checks and clearly state their limitations.
+
+PART 10 — SECURITY OF WEBSITE INSPECTION
+
+Inspect existing Playwright and server-side URL fetching.
+
+Enforce:
+
+- Strict allowed URL schemes.
+- Safe URL parsing.
+- IPv4 and IPv6 private/reserved-address blocking.
+- DNS resolution checks and rebinding protections.
+- Validation of every redirect.
+- Browser subresource request controls.
+- Navigation and request timeouts.
+- Response-size limits.
+- Download and pop-up restrictions.
+- Isolation between investigations.
+- Protection against requests to localhost, internal services and cloud metadata endpoints.
+
+Never navigate to a suspicious link directly from the user's browser.
+
+Do not let a user-supplied URL access private internal services. Do not bypass browser security controls to improve detection.
+
+PART 11 — FRONTEND MUST NOT MISREPRESENT RESULTS
+
+Inspect all verdict badges, result cards, default values, API error handling and loading states.
+
+Requirements:
+
+- Never show green “OK” merely because no threat was found.
+- Do not show “Verified Genuine” without an actual successful authoritative verification.
+- Display “Not independently verified” when appropriate.
+- Clearly distinguish threat assessment from document authenticity.
+- Display unavailable checks and evidence limitations.
+- Ensure old cached or stale UI state cannot appear as the result for a new upload.
+- Never map unknown or malformed verdicts to a success badge.
+- Make the explanation readable for nontechnical users.
+
+Use accessible, consistent result labels and colors. Preserve the existing premium design and S-shield identity.
+
+PART 12 — TESTS THAT MUST BE ADDED
+
+Create controlled synthetic test fixtures covering at least 60 distinct cases if feasible, across all supported scam categories.
+
+Include:
+
+- Genuine public safety notices.
+- Genuine routine telecom messages.
+- Genuine challan fixtures with controlled expected results.
+- Fake challans and fabricated fine demands.
+- Fake grant and OTP requests.
+- Fake bank and mobile-wallet messages.
+- Look-alike domains and deceptive subdomains.
+- Unresolvable phishing-like domains.
+- QR-code phishing.
+- Fake prizes, parcels, job offers and investments.
+- Fake receipts and payment proofs.
+- Blackmail and extortion.
+- Official-looking screenshots without verification.
+- Ambiguous screenshots.
+- Unreadable or cropped images.
+- Empty threat-intelligence responses.
+- Timeouts and missing credentials.
+- Malformed backend responses.
+- Cache and stale-state errors.
+- Genuine warnings that mention scam terminology without performing a scam.
+- Near-identical message pairs where one important detail changes.
+
+Test the complete backend and frontend flow wherever feasible. Assert the actual displayed verdict and evidence, not only a helper function's return value.
+
+Use independently justified expected results. Do not label a synthetic screenshot “genuine” merely because it was designed to look genuine.
+
+PART 13 — HONEST REPORTING AND IMPLEMENTATION
+
+First inspect the actual codebase and reproduce the current failure. Do not claim success from a proposed code change alone.
+
+Identify the smallest safe fixes. Avoid unrelated rewrites.
+
+Run:
+
+- Automated tests.
+- TypeScript checks.
+- Lint.
+- Production build.
+- Regression tests against the exact screenshot that previously received an incorrect OK verdict, if the image is available.
+
+Report:
+
+1. Root cause.
+2. Exact files changed.
+3. Before-and-after verdict and evidence.
+4. Test results and actual commands.
+5. Any official sources genuinely accessed.
+6. Failed or unavailable checks.
+7. Remaining false-positive and false-negative risks.
+8. Current external API terms, quota limits and costs.
+9. Features or sources that remain unverified.
+
+Do not invent test counts, official-source results, threat matches or successful API responses. If the original screenshot is unavailable, explicitly ask me to provide it and do not claim its bug has been fixed.
+
+FINAL GOAL
+
+SIN Cyber Saathi must not simply answer “yes, this is correct” because a screenshot looks official or because no known malicious link was found.
+
+It must explain what it checked, what evidence it found, whether the specific record was verified, what remains uncertain, and what the user should safely do next.
+
+Deliver a reliable, evidence-based and maintainable application using existing infrastructure and genuinely free services wherever possible.

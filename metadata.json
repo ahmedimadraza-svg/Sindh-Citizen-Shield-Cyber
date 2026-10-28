@@ -1,0 +1,6 @@
+{
+  "name": "Sindh Citizen Shield - Civic Cyber Defense",
+  "description": "Real-time heuristic threat detection for deceptive welfare claims, fake links, and digital fraud across Sindh with FIA 1991 emergency integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
