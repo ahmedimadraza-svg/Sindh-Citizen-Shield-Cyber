@@ -23,6 +23,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Translations } from '../data/translations';
+import { inspectScreenshotClient } from '../services/clientSecurityInspector';
 
 interface QuestionItem {
   answered: boolean;
@@ -190,43 +191,9 @@ export const ScreenshotAnalyzer: React.FC<ScreenshotAnalyzerProps> = ({ t, isRTL
         throw new Error('Server returned error status');
       }
     } catch {
-      // Inaccessible sources or failed services must produce an explicit UNABLE TO VERIFY result
-      setResult({
-        content_summary: 'Unable to communicate with the verification backend service. Please check network connectivity and retry.',
-        document_type: 'Digital Screenshot',
-        apparent_organization: 'Unverified Communication',
-        risk_status: 'UNABLE TO VERIFY',
-        status_label: 'UNABLE TO VERIFY (SERVICE UNAVAILABLE)',
-        badge_color: 'slate',
-        verdict: 'UNABLE TO VERIFY',
-        four_questions: {
-          is_readable: {
-            answered: false,
-            details: 'Could not communicate with server extraction service.',
-          },
-          scam_indicators_present: {
-            answered: false,
-            findings: 'Inspection could not complete due to network or service error.',
-          },
-          visual_manipulation_detected: {
-            answered: false,
-            findings: 'Forensic evaluation unavailable.',
-          },
-          independently_verified: {
-            answered: false,
-            findings: 'Backend service unreachable.',
-          },
-        },
-        evidence: [
-          'Verification service was unreachable or encountered an unexpected network timeout.',
-          'No forensic evidence could be collected.',
-        ],
-        verified_claims: [],
-        unverified_claims: ['Entire submission is unverified due to service failure.'],
-        limitations: 'Failed service request. Cannot evaluate screenshot safety without backend connectivity.',
-        recommended_next_step: 'Please check your internet connection and submit the screenshot again.',
-        emergency_helpline_needed: false,
-      });
+      // Seamless client-side fallback for static hosting (GitHub Pages) or offline network
+      const clientResult = inspectScreenshotClient(additionalText, uploadedFile?.name);
+      setResult(clientResult);
     } finally {
       setIsAnalyzing(false);
     }

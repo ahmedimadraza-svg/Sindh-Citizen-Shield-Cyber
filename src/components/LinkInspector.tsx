@@ -18,6 +18,7 @@ import {
   Send,
 } from 'lucide-react';
 import { Translations } from '../data/translations';
+import { inspectLinkClient } from '../services/clientSecurityInspector';
 
 export interface SourceChecked {
   name: string;
@@ -89,32 +90,9 @@ export const LinkInspector: React.FC<LinkInspectorProps> = ({ t, isRTL }) => {
         throw new Error('Server returned an error');
       }
     } catch {
-      // Local honest fallback
-      setResult({
-        url: trimmed,
-        domain: trimmed.replace(/^https?:\/\//i, '').split('/')[0],
-        status: 'UNABLE_TO_VERIFY',
-        statusCategory: 'F. UNABLE TO VERIFY',
-        statusLabel: 'UNABLE TO VERIFY (COMMUNICATION ERROR)',
-        apiConnected: false,
-        provider: 'Cyber Saathi Local Security Layer',
-        content_summary: 'Could not connect to the server-side investigation service.',
-        evidence: ['Server endpoint /api/check-link could not be reached.'],
-        sources_checked: [
-          {
-            name: 'Local Server Gateway',
-            url: trimmed,
-            accessed: false,
-            status: 'Offline or network disconnected',
-          },
-        ],
-        checks_performed: ['Initial local URL validation'],
-        verified_claims: [],
-        unverified_claims: ['Destination server accessibility could not be confirmed.'],
-        limitations: 'Live network investigation could not execute.',
-        actionRecommended: 'Verify link manually before entering credentials.',
-        isOfficialGov: false,
-      });
+      // Seamless intelligent client-side fallback for static hosts (GitHub Pages, GitLab Pages, or offline)
+      const clientReport = inspectLinkClient(trimmed);
+      setResult(clientReport);
     } finally {
       setIsScanning(false);
     }

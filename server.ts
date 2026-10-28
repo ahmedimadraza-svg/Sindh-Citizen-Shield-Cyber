@@ -31,6 +31,16 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '15mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Normalize paths for Vercel Serverless Function rewrites
+app.use((req, _res, next) => {
+  if (req.url.startsWith('/api/index.ts')) {
+    req.url = req.url.replace('/api/index.ts', '/api') || '/';
+  } else if (req.url.startsWith('/api/index')) {
+    req.url = req.url.replace('/api/index', '/api') || '/';
+  }
+  next();
+});
+
 const geminiApiKey = process.env.GEMINI_API_KEY;
 let ai: GoogleGenAI | null = null;
 if (geminiApiKey) {
@@ -52,7 +62,7 @@ const feedbackReports: FeedbackReport[] = [];
 // =========================================================================
 // 0. BROWSER STATUS & ENVIRONMENT CAPABILITY ENDPOINT
 // =========================================================================
-app.get('/api/browser-status', (_req: Request, res: Response) => {
+app.get(['/api/browser-status', '/browser-status'], (_req: Request, res: Response) => {
   const supported = isHeadlessChromiumSupported();
   res.json({
     supported,
@@ -64,7 +74,7 @@ app.get('/api/browser-status', (_req: Request, res: Response) => {
   });
 });
 
-app.get('/api/authoritative-sources', (_req: Request, res: Response) => {
+app.get(['/api/authoritative-sources', '/authoritative-sources'], (_req: Request, res: Response) => {
   res.json({
     total: AUTHORITATIVE_REGISTRY.length,
     sources: AUTHORITATIVE_REGISTRY,
@@ -74,7 +84,7 @@ app.get('/api/authoritative-sources', (_req: Request, res: Response) => {
 // =========================================================================
 // 1. ADVANCED EVIDENCE-BASED LINK INVESTIGATION ENDPOINT
 // =========================================================================
-app.post('/api/check-link', async (req: Request, res: Response) => {
+app.post(['/api/check-link', '/check-link'], async (req: Request, res: Response) => {
   try {
     const { url } = req.body;
     if (!url || typeof url !== 'string' || !url.trim()) {
@@ -155,7 +165,7 @@ app.post('/api/check-link', async (req: Request, res: Response) => {
 // =========================================================================
 // 2. EVIDENCE-BASED SCREENSHOT INVESTIGATION ENDPOINT (5-QUESTION AUDIT)
 // =========================================================================
-app.post('/api/analyze-screenshot', async (req: Request, res: Response) => {
+app.post(['/api/analyze-screenshot', '/analyze-screenshot'], async (req: Request, res: Response) => {
   try {
     const imageBase64 = req.body.imageBase64 || req.body.image || req.body.imageData;
     const { mimeType = 'image/png', bypassCache = false } = req.body;
@@ -359,7 +369,7 @@ function formatScreenshotResponse(report: SharedInvestigationReport, docType?: s
 // =========================================================================
 // 3. USER FEEDBACK REPORTING (ACCURACY & FALSE-POSITIVE AUDIT)
 // =========================================================================
-app.post('/api/submit-feedback', (req: Request, res: Response) => {
+app.post(['/api/submit-feedback', '/submit-feedback'], (req: Request, res: Response) => {
   try {
     const { targetType, targetIdentifier, originalStatus, userCorrection, userNotes } = req.body;
 
@@ -395,7 +405,7 @@ app.post('/api/submit-feedback', (req: Request, res: Response) => {
   }
 });
 
-app.get('/api/diagnostic-traces', (_req: Request, res: Response) => {
+app.get(['/api/diagnostic-traces', '/diagnostic-traces'], (_req: Request, res: Response) => {
   res.json({
     recent: getRecentDiagnosticLogs(50),
     falseNegativeCandidates: getFalseNegativeCandidates(),
@@ -405,7 +415,7 @@ app.get('/api/diagnostic-traces', (_req: Request, res: Response) => {
 // =========================================================================
 // 4. CYBER SAATHI INTERACTIVE AI COUNSELOR CHATBOT
 // =========================================================================
-app.post('/api/chat-counselor', async (req: Request, res: Response) => {
+app.post(['/api/chat-counselor', '/chat-counselor'], async (req: Request, res: Response) => {
   try {
     const { messages, language = 'en' } = req.body;
 
