@@ -276,3 +276,17 @@ test('16. Repeated checks of the same URL under unchanged evidence (10 iteration
     );
   }
 });
+
+// 17. Delivery failure scam with incomplete/cut-off link
+test('17. Delivery failure scam with cut-off link evaluates to SUSPICIOUS', async () => {
+  const sample = {
+    rawText: 'Delivery failed to you 2/2 times, please update your latest address, otherwise it will be returned to the seller. https:...',
+    bypassCache: true,
+  };
+  const report = await investigateScreenshotEvidence(sample);
+  assert.equal(report.verdict, 'SUSPICIOUS');
+  assert.equal(report.badgeColor, 'amber');
+  assert.ok(report.statusLabel.includes('DELIVERY'));
+  assert.ok(report.evidence.some((e) => e.includes('delivery failure') || e.includes('seller')));
+});
+

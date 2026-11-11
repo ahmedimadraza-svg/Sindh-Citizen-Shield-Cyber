@@ -60,8 +60,24 @@ interface FeedbackReport {
 const feedbackReports: FeedbackReport[] = [];
 
 // =========================================================================
-// 0. BROWSER STATUS & ENVIRONMENT CAPABILITY ENDPOINT
+// 0. API ROOT STATUS & ENVIRONMENT CAPABILITY ENDPOINT
 // =========================================================================
+app.get(['/api', '/api/health', '/health'], (_req: Request, res: Response) => {
+  res.json({
+    status: 'online',
+    service: 'Cyber Saathi Forensic Investigation Gateway',
+    version: '2.6.0',
+    endpoints: [
+      '/api/check-link',
+      '/api/analyze-screenshot',
+      '/api/chat-counselor',
+      '/api/browser-status',
+      '/api/submit-feedback',
+      '/api/authoritative-sources',
+    ],
+  });
+});
+
 app.get(['/api/browser-status', '/browser-status'], (_req: Request, res: Response) => {
   const supported = isHeadlessChromiumSupported();
   res.json({
@@ -231,11 +247,12 @@ Return strictly valid JSON adhering to this schema:
 }`;
 
       const VISION_MODELS = [
+        'gemini-2.5-flash',
+        'gemini-flash-latest',
+        'gemini-3.8-flash',
         'gemini-3.5-flash',
         'gemini-3.5-flash-lite',
         'gemini-3.6-flash',
-        'gemini-flash-latest',
-        'gemini-3.8-flash',
       ];
 
       let extractionSuccess = false;
@@ -646,10 +663,12 @@ Warm, respectful, protective, never scary or insulting. Use emojis only for verd
       }));
 
       const CHAT_MODELS = [
+        'gemini-2.5-flash',
+        'gemini-flash-latest',
+        'gemini-3.8-flash',
         'gemini-3.5-flash',
         'gemini-3.5-flash-lite',
         'gemini-3.6-flash',
-        'gemini-flash-latest',
       ];
 
       for (const modelName of CHAT_MODELS) {

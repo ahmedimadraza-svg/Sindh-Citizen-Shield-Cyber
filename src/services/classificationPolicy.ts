@@ -149,6 +149,8 @@ export interface EvidenceInput {
   unverifiedShortLinkReason?: string;
   hasUnexpectedGrantClaim?: boolean;
   hasAccountActionViaLink?: boolean;
+  hasIncompleteLink?: boolean;
+  isDeliveryScam?: boolean;
 }
 
 export const SHORTENER_DOMAINS = new Set([
@@ -307,6 +309,8 @@ function buildDecisionPath(params: {
       hasAccountActionViaLink: Boolean(params.conditionTruthTable.hasAccountActionViaLink),
       isShortenedUrl: Boolean(params.conditionTruthTable.isShortenedUrl),
       isUnverifiedShortLink: Boolean(params.conditionTruthTable.isUnverifiedShortLink),
+      isDeliveryScam: Boolean(params.conditionTruthTable.isDeliveryScam),
+      hasIncompleteLink: Boolean(params.conditionTruthTable.hasIncompleteLink),
     },
     verdict: params.verdict,
     verdictCategory: params.verdictCategory,
@@ -460,6 +464,35 @@ export function evaluateEvidence(input: EvidenceInput): EvaluatedDecision {
     );
   }
 
+  // Contextual Signal 6: Package / Delivery failure urgency scam (return to seller / address update)
+  const isDeliveryScam =
+    Boolean(input.isDeliveryScam) ||
+    (!input.isProtectiveAdvisory &&
+      /(?:delivery\s+failed|failed\s+delivery|package\s+delivery|parcel\s+delivery|shipment\s+delayed|undelivered\s+parcel|delivery\s+attempt|2\/2\s+times|\b2\/2\b)/i.test(lowerText) &&
+      /(?:update\s+(?:your\s+)?(?:latest\s+)?address|confirm\s+(?:your\s+)?address|reschedule\s+delivery|returned\s+to\s+(?:the\s+)?seller|returned\s+to\s+sender|pay\s+(?:redelivery|shipping)\s+fee|otherwise\s+it\s+will\s+be\s+returned)/i.test(lowerText));
+  if (isDeliveryScam) {
+    detectedScamSignals.push(
+      'Fake delivery failure lure: Fraudulent notice urging address update or parcel fee to prevent return to seller.'
+    );
+  }
+
+  // Candidate URLs collected from extracted list and primary URL
+  const candidateUrls = [...(input.urlsExtracted || [])];
+  if (primaryUrl && !candidateUrls.includes(primaryUrl)) {
+    candidateUrls.push(primaryUrl);
+  }
+
+  // Contextual Signal 7: Incomplete / Cut-off Link in text
+  const hasIncompleteLink =
+    Boolean(input.hasIncompleteLink) ||
+    /(?:https?:\.\.\.|https?:\/\/\S*(?:\.\.\.|…)|https?:\/\/\.\.\.|https?:(?:\/\/)?\s*(?:\.\.\.|…)|(?:bit\.l|tinyurl\.c|t\.c)\b|\bhttps?:(?:\.\.\.|…))/i.test(lowerText) ||
+    candidateUrls.some((u) => u.endsWith('...') || u.endsWith('…') || u.includes('...'));
+  if (hasIncompleteLink) {
+    detectedScamSignals.push(
+      'Incomplete / broken link: The web address is cut off, ends with "...", or looks half-copied. An incomplete link cannot be verified.'
+    );
+  }
+
   const extortionThreat =
     /(send\s+ransom|private\s+video|private\s+recording|broadcast|blackmail|rupay\s+bhejo\s+warna|avoid\s+arrest|penalty\s+fee|pay\s+penalty|fine\s+immediately|arrest\s+warrant|within\s+2\s+hours|vehicle\s+impound|impound\s+vehicle)/i.test(
       lowerText
@@ -492,11 +525,6 @@ export function evaluateEvidence(input: EvidenceInput): EvaluatedDecision {
   // Deceptive URL Lures & High-Risk TLD Signals
   const linkLures: string[] = [];
   let linkHasHighRiskTld = false;
-
-  const candidateUrls = [...(input.urlsExtracted || [])];
-  if (primaryUrl && !candidateUrls.includes(primaryUrl)) {
-    candidateUrls.push(primaryUrl);
-  }
 
   for (const u of candidateUrls) {
     let isGovDomain = false;
@@ -585,9 +613,13 @@ export function evaluateEvidence(input: EvidenceInput): EvaluatedDecision {
     }
   }
 
+  if (hasIncompleteLink) {
+    urlFindings = 'The link is cut off, ends with "...", or looks half-copied. An incomplete link cannot be verified.';
+  }
+
   const questionC: QuestionResult = {
-    answered: Boolean(primaryUrl),
-    summary: primaryUrl ? `URL: ${primaryUrl}` : 'No URL identified.',
+    answered: Boolean(primaryUrl || hasIncompleteLink),
+    summary: primaryUrl ? `URL: ${primaryUrl}` : hasIncompleteLink ? 'Incomplete / broken link' : 'No URL identified.',
     findings: urlFindings,
   };
 
@@ -1084,27 +1116,45 @@ export function evaluateEvidence(input: EvidenceInput): EvaluatedDecision {
         hasAccountActionViaLink: Boolean(hasAccountActionViaLink),
         isShortenedUrl: Boolean(isShortenedUrlCandidate),
         isUnverifiedShortLink: Boolean(isUnverifiedShortLink),
+        isDeliveryScam: Boolean(isDeliveryScam),
+        hasIncompleteLink: Boolean(hasIncompleteLink),
       },
       verdict: 'SUSPICIOUS',
       verdictCategory: 'SUSPICIOUS',
       badgeColor: 'amber',
-      statusLabel: 'SUSPICIOUS — INVESTIGATION NEEDED',
+      statusLabel: isDeliveryScam
+        ? 'SUSPICIOUS — FAKE DELIVERY FAILURE NOTICE'
+        : hasIncompleteLink
+        ? 'SUSPICIOUS — INCOMPLETE / BROKEN LINK'
+        : 'SUSPICIOUS — INVESTIGATION NEEDED',
       evidenceItemsCount: evidence.length,
     });
 
     return {
       verdict: 'SUSPICIOUS',
       verdictCategory: 'SUSPICIOUS',
-      statusLabel: 'SUSPICIOUS — INVESTIGATION NEEDED',
+      statusLabel: isDeliveryScam
+        ? 'SUSPICIOUS — FAKE DELIVERY FAILURE NOTICE'
+        : hasIncompleteLink
+        ? 'SUSPICIOUS — INCOMPLETE / BROKEN LINK'
+        : 'SUSPICIOUS — INVESTIGATION NEEDED',
       badgeColor: 'amber',
-      contentSummary: hasUnexpectedGrantClaim && mentionsGcash
+      contentSummary: isDeliveryScam
+        ? 'Suspicious delivery failure notice urging an address update or fee to prevent return to seller. Scammers use urgent parcel claims with unverified or cut-off links to harvest personal addresses and payment credentials.'
+        : hasIncompleteLink
+        ? 'This message contains an incomplete or cut-off link (ends with "..."). Scammers frequently conceal the destination, and an incomplete link cannot be verified.'
+        : hasUnexpectedGrantClaim && mentionsGcash
         ? 'Suspicious cash assistance alert claiming DSWD Ayuda via GCash with an external shortened link. GCash strictly prohibits clickable SMS links, and the short-link destination has not been verified.'
         : 'Warning signs identified. The communication or web link exhibits anomalous characteristics and should be handled with extreme caution.',
       evidence,
       verifiedClaims,
       unverifiedClaims,
       limitations: 'Warning signs detected, but insufficient evidence to conclusively prove fraud. Treat with high skepticism.',
-      actionRecommended: (hasUnexpectedGrantClaim || mentionsGcash)
+      actionRecommended: isDeliveryScam
+        ? 'Do NOT click the link, and do NOT submit your home address or payment card details. If you are expecting an actual parcel, track it directly through the courier’s official app or portal using your original tracking number.'
+        : hasIncompleteLink
+        ? 'This link is cut off, so its destination cannot be safely confirmed. Do NOT open it. Ask the sender for the full official link, or visit the official website directly.'
+        : (hasUnexpectedGrantClaim || mentionsGcash)
         ? 'Do NOT click the external link. Do NOT enter MPIN, passwords, or personal details. Verify cash aid directly with official DSWD channels (https://www.dswd.gov.ph) and check your balance only within the official GCash mobile app.'
         : 'Do NOT enter passwords, banking PINs, or personal CNIC details. Verify the message via official organizational channels.',
       fiveQuestions,

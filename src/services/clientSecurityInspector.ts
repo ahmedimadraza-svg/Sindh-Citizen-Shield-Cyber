@@ -7,7 +7,7 @@
  * Zero Node.js-only dependencies.
  */
 
-import { AdvancedLinkResult } from '../components/LinkInspector';
+import type { AdvancedLinkResult } from '../components/LinkInspector.tsx';
 
 // Verified Civic Domain Registry
 export interface CivicRegistryEntry {
@@ -469,16 +469,28 @@ export function inspectScreenshotClient(
   const fakeExtortion = /arrest|police|court|fia|fir|cybercrime|legal notice|case registered/i.test(clean);
   const fakeJobLoan = /easy loan|instant loan|job offer|daily income|part[-\s]?time job|earn 5000/i.test(clean);
 
+  const isDeliveryScam =
+    /(?:delivery\s+failed|failed\s+delivery|package\s+delivery|parcel\s+delivery|shipment\s+delayed|undelivered\s+parcel|delivery\s+attempt|2\/2\s+times|\b2\/2\b)/i.test(clean) &&
+    /(?:update\s+(?:your\s+)?(?:latest\s+)?address|confirm\s+(?:your\s+)?address|reschedule\s+delivery|returned\s+to\s+(?:the\s+)?seller|returned\s+to\s+sender|pay\s+(?:redelivery|shipping)\s+fee|otherwise\s+it\s+will\s+be\s+returned)/i.test(clean);
+
+  const hasIncompleteLink =
+    /(?:https?:\.\.\.|https?:\/\/\S*(?:\.\.\.|…)|https?:\/\/\.\.\.|https?:(?:\/\/)?\s*(?:\.\.\.|…)|(?:bit\.l|tinyurl\.c|t\.c)\b|\bhttps?:(?:\.\.\.|…))/i.test(clean) ||
+    urlsFound.some((u) => u.endsWith('...') || u.endsWith('…') || u.includes('...'));
+
   let verdict: 'CONFIRMED THREAT' | 'SUSPICIOUS' | 'NO KNOWN THREAT FOUND' = 'SUSPICIOUS';
   let badgeColor: 'red' | 'amber' | 'emerald' = 'amber';
-  let statusLabel = 'SUSPICIOUS (WARNING SIGNS DETECTED)';
+  let statusLabel = isDeliveryScam
+    ? 'SUSPICIOUS — FAKE DELIVERY FAILURE NOTICE'
+    : hasIncompleteLink
+    ? 'SUSPICIOUS — INCOMPLETE / BROKEN LINK'
+    : 'SUSPICIOUS (WARNING SIGNS DETECTED)';
   let apparentOrg = 'Unverified Sender';
 
   if (linkReport?.status === 'CONFIRMED_THREAT' || demandsOtp || fakeExtortion) {
     verdict = 'CONFIRMED THREAT';
     badgeColor = 'red';
     statusLabel = 'CONFIRMED FRAUD THREAT';
-  } else if (linkReport?.status === 'OFFICIAL_SOURCE_CORROBORATED') {
+  } else if (linkReport?.status === 'OFFICIAL_SOURCE_CORROBORATED' && !isDeliveryScam && !hasIncompleteLink) {
     verdict = 'NO KNOWN THREAT FOUND';
     badgeColor = 'emerald';
     statusLabel = 'OFFICIAL SOURCE CORROBORATED';
@@ -494,12 +506,22 @@ export function inspectScreenshotClient(
   if (fakeExtortion) {
     evidence.push('Extortion / Intimidation Tactic: Mentions legal action or government arrest to induce fear and demand immediate payments.');
   }
+  if (isDeliveryScam) {
+    evidence.push('Fake delivery failure lure: Fraudulent notice urging address update or parcel fee to prevent return to seller.');
+  }
+  if (hasIncompleteLink) {
+    evidence.push('Incomplete / broken link: The web address is cut off (ends with "..."). Destination cannot be safely verified.');
+  }
   if (linkReport) {
     evidence.push(...linkReport.evidence);
   }
 
   return {
-    content_summary: verdict === 'CONFIRMED THREAT'
+    content_summary: isDeliveryScam
+      ? 'Suspicious delivery failure notice urging address update to prevent parcel return to seller. Scammers use urgent parcel claims with unverified or cut-off links to harvest personal addresses and payment credentials.'
+      : hasIncompleteLink
+      ? 'This message contains an incomplete or cut-off web link (ends with "..."). Scammers frequently conceal the destination, and an incomplete link cannot be safely verified.'
+      : verdict === 'CONFIRMED THREAT'
       ? 'DANGER: This communication exhibits clear signs of financial fraud or credential theft.'
       : verdict === 'NO KNOWN THREAT FOUND'
       ? 'Corroborated with verified civic records. No malicious indicators found in the text.'
@@ -514,7 +536,13 @@ export function inspectScreenshotClient(
       is_readable: { answered: true, details: `Successfully analyzed ${clean.length} characters of provided text.` },
       scam_indicators_present: {
         answered: true,
-        findings: verdict === 'CONFIRMED THREAT' ? 'Active fraud indicators detected (OTP demand, extortion, or fake link).' : 'Suspicious claims without verified backing.',
+        findings: verdict === 'CONFIRMED THREAT'
+          ? 'Active fraud indicators detected (OTP demand, extortion, or fake link).'
+          : isDeliveryScam
+          ? 'Fake delivery notice urging address update under threat of parcel return.'
+          : hasIncompleteLink
+          ? 'Incomplete link hiding destination address.'
+          : 'Suspicious claims without verified backing.',
       },
       visual_manipulation_detected: { answered: false, findings: 'Manual forensic analysis of text content performed.' },
       independently_verified: {
@@ -529,7 +557,11 @@ export function inspectScreenshotClient(
     verified_claims: verdict === 'NO KNOWN THREAT FOUND' ? ['Authenticated civic communication'] : [],
     unverified_claims: verdict !== 'NO KNOWN THREAT FOUND' ? ['Claims of funds, lottery prizes, or threats are unverified.'] : [],
     limitations: 'Client-side heuristic evaluation based on extracted text and links.',
-    recommended_next_step: verdict === 'CONFIRMED THREAT'
+    recommended_next_step: isDeliveryScam
+      ? 'Do NOT click the link, and do NOT submit your home address or payment card details. If you are expecting an actual parcel, track it directly through the courier’s official app or portal using your original tracking number.'
+      : hasIncompleteLink
+      ? 'This link is cut off, so its destination cannot be safely confirmed. Do NOT open it. Ask the sender for the full official link, or visit the official website directly.'
+      : verdict === 'CONFIRMED THREAT'
       ? 'Block sender immediately. If you shared an OTP or bank details, call your bank and FIA 1991 right now.'
       : 'Do not click links or call numbers provided in the message. Check your official banking app directly.',
     emergency_helpline_needed: verdict === 'CONFIRMED THREAT',

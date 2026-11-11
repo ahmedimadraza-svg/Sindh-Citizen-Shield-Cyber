@@ -54,6 +54,8 @@ export interface DecisionPathLog {
     hasAccountActionViaLink?: boolean;
     isShortenedUrl?: boolean;
     isUnverifiedShortLink?: boolean;
+    isDeliveryScam?: boolean;
+    hasIncompleteLink?: boolean;
   };
   verdict: string;
   verdictCategory: string;
